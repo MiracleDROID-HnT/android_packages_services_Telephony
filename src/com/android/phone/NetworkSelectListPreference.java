@@ -27,7 +27,6 @@ import android.os.Parcelable;
 import android.os.RemoteException;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.telephony.ServiceState;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.text.BidiFormatter;
@@ -40,7 +39,6 @@ import com.android.internal.telephony.OperatorInfo;
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneFactory;
 
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -69,9 +67,6 @@ public class NetworkSelectListPreference extends ListPreference
 
     private int mSubId;
     private NetworkOperators mNetworkOperators;
-
-    //map of RAT type values to user understandable strings
-    private HashMap<String, String> mRatMap;
 
     private ProgressDialog mProgressDialog;
     public NetworkSelectListPreference(Context context, AttributeSet attrs) {
@@ -196,9 +191,6 @@ public class NetworkSelectListPreference extends ListPreference
         if (SubscriptionManager.isValidSubscriptionId(mSubId)) {
             mPhoneId = SubscriptionManager.getPhoneId(mSubId);
         }
-
-        mRatMap = new HashMap<String, String>();
-        initRatMap();
 
         TelephonyManager telephonyManager = (TelephonyManager)
                 getContext().getSystemService(Context.TELEPHONY_SERVICE);
@@ -352,47 +344,20 @@ public class NetworkSelectListPreference extends ListPreference
      * else MCCMNC string.
      */
     private String getNetworkTitle(OperatorInfo ni) {
-        String title;
-
         if (!TextUtils.isEmpty(ni.getOperatorAlphaLong())) {
-            title = ni.getOperatorAlphaLong();
+            return ni.getOperatorAlphaLong();
         } else if (!TextUtils.isEmpty(ni.getOperatorAlphaShort())) {
-            title = ni.getOperatorAlphaShort();
+            return ni.getOperatorAlphaShort();
         } else {
             BidiFormatter bidiFormatter = BidiFormatter.getInstance();
-            title = bidiFormatter.unicodeWrap(ni.getOperatorNumeric(), TextDirectionHeuristics.LTR);
+            return bidiFormatter.unicodeWrap(ni.getOperatorNumeric(), TextDirectionHeuristics.LTR);
         }
-        if (!ni.getRadioTech().equals(""))
-            title += " " + mRatMap.get(ni.getRadioTech());
-
-        return title;
     }
 
     private void clearList() {
         if (mOperatorInfoList != null) {
             mOperatorInfoList.clear();
         }
-    }
-
-    private void initRatMap() {
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_UNKNOWN), "Unknown");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_GPRS), "2G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_EDGE), "2G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_UMTS), "3G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_IS95A), "2G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_IS95B), "2G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_1xRTT), "2G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_EVDO_0), "3G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_EVDO_A), "3G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_HSDPA), "3G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_HSUPA), "3G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_HSPA), "3G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_EVDO_B), "3G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_EHRPD), "3G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_LTE), "4G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_HSPAP), "3G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_GSM), "2G");
-        mRatMap.put(String.valueOf(ServiceState.RIL_RADIO_TECHNOLOGY_TD_SCDMA), "3G");
     }
 
     private void dismissProgressBar() {
