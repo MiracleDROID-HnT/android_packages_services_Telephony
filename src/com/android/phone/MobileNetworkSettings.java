@@ -206,6 +206,7 @@ public class MobileNetworkSettings extends Activity  {
 
         //Information that needs to save into Bundle.
         private static final String EXPAND_ADVANCED_FIELDS = "expand_advanced_fields";
+        private static final String FORCE_EXPANDED_SETTINGS = "force_expanded_settings";
 
         private SubscriptionManager mSubscriptionManager;
         private TelephonyManager mTelephonyManager;
@@ -233,6 +234,7 @@ public class MobileNetworkSettings extends Activity  {
         private MyHandler mHandler;
         private boolean mOkClicked;
         private boolean mExpandAdvancedFields;
+        private boolean mForceExpanded;
 
         // We assume the the value returned by mTabHost.getCurrentTab() == slotId
         private TabHost mTabHost;
@@ -807,7 +809,10 @@ public class MobileNetworkSettings extends Activity  {
 
             updateBodyBasicFields(activity, prefSet, phoneSubId, hasActiveSubscriptions);
 
-            if (mExpandAdvancedFields) {
+            mForceExpanded = Settings.System.getInt(getContext().getContentResolver(),
+                    Settings.System.FORCE_EXPANDED_SETTINGS, 0) != 0;
+
+            if (mExpandAdvancedFields || mForceExpanded) {
                 updateBodyAdvancedFields(activity, prefSet, phoneSubId, hasActiveSubscriptions);
             } else {
                 prefSet.addPreference(mAdvancedOptions);
