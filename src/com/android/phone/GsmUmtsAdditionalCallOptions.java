@@ -17,9 +17,11 @@ public class GsmUmtsAdditionalCallOptions extends TimeConsumingPreferenceActivit
 
     private static final String BUTTON_CLIR_KEY  = "button_clir_key";
     private static final String BUTTON_CW_KEY    = "button_cw_key";
+    private static final String BUTTON_PN_KEY    = "button_pn_key";
 
     private CLIRListPreference mCLIRButton;
     private CallWaitingSwitchPreference mCWButton;
+    private MSISDNEditPreference mMSISDNButton;
 
     private final ArrayList<Preference> mPreferences = new ArrayList<Preference>();
     private int mInitIndex = 0;
@@ -40,9 +42,11 @@ public class GsmUmtsAdditionalCallOptions extends TimeConsumingPreferenceActivit
         PreferenceScreen prefSet = getPreferenceScreen();
         mCLIRButton = (CLIRListPreference) prefSet.findPreference(BUTTON_CLIR_KEY);
         mCWButton = (CallWaitingSwitchPreference) prefSet.findPreference(BUTTON_CW_KEY);
+        mMSISDNButton = (MSISDNEditPreference) prefSet.findPreference(BUTTON_PN_KEY);
 
         mPreferences.add(mCLIRButton);
         mPreferences.add(mCWButton);
+        mPreferences.add(mMSISDNButton);
 
         if (icicle == null) {
             if (DBG) Log.d(LOG_TAG, "start to init ");
@@ -52,6 +56,7 @@ public class GsmUmtsAdditionalCallOptions extends TimeConsumingPreferenceActivit
             mInitIndex = mPreferences.size();
             mCLIRButton.init(this, true, mPhone);
             mCWButton.init(this, true, mPhone);
+            mMSISDNButton.init(this, false, mPhone);
             int[] clirArray = icicle.getIntArray(mCLIRButton.getKey());
             if (clirArray != null) {
                 if (DBG) Log.d(LOG_TAG, "onCreate:  clirArray[0]="
@@ -85,6 +90,8 @@ public class GsmUmtsAdditionalCallOptions extends TimeConsumingPreferenceActivit
             Preference pref = mPreferences.get(mInitIndex);
             if (pref instanceof CallWaitingSwitchPreference) {
                 ((CallWaitingSwitchPreference) pref).init(this, false, mPhone);
+            } else if (pref instanceof MSISDNEditPreference) {
+                ((MSISDNEditPreference) pref).init(this, false, mPhone);
             }
         }
         super.onFinished(preference, reading);
